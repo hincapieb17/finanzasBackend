@@ -3,6 +3,7 @@ package com.finanzas.backend.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,8 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "ahorros")
-public class Ahorro {
+@Table(name = "Cuenta")
+public class Cuenta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,22 +23,21 @@ public class Ahorro {
     @JoinColumn(name = "id_persona")
     private Persona persona;
 
-    private LocalDate fecha;
-
+    @Column(nullable = true)
     private BigDecimal monto;
 
+    @Column(length = 30, nullable = true)
     private String descripcion;
     
 
-	public Ahorro() {
+	public Cuenta() {
 		super();
 	}
 
-	public Ahorro(Long id, Persona persona, LocalDate fecha, BigDecimal monto, String descripcion) {
+	public Cuenta(Long id, Persona persona, BigDecimal monto, String descripcion) {
 		super();
 		this.id = id;
 		this.persona = persona;
-		this.fecha = fecha;
 		this.monto = monto;
 		this.descripcion = descripcion;
 	}
@@ -56,14 +56,6 @@ public class Ahorro {
 
 	public void setPersona(Persona persona) {
 		this.persona = persona;
-	}
-
-	public LocalDate getFecha() {
-		return fecha;
-	}
-
-	public void setFecha(LocalDate fecha) {
-		this.fecha = fecha;
 	}
 
 	public BigDecimal getMonto() {

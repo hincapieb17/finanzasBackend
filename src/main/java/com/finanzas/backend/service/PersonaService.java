@@ -33,7 +33,8 @@ public class PersonaService {
             persona.setNombre(personaDetails.getNombre());
             persona.setApellido(personaDetails.getApellido());
             persona.setEdad(personaDetails.getEdad());
-            persona.setCorreoElectronico(personaDetails.getCorreoElectronico());
+            persona.setCorreoElectronico(personaDetails.getCorreo());
+            persona.setPassword(personaDetails.getPassword());
             return personaRepository.save(persona);
         }
         else {

@@ -6,39 +6,38 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.finanzas.backend.model.Ahorro;
-import com.finanzas.backend.repository.AhorroRepository;
+import com.finanzas.backend.model.Cuenta;
+import com.finanzas.backend.repository.CuentaRepository;
 
 @Service
-public class AhorroService {
+public class CuentaService {
 	
 	
-	private final AhorroRepository ahorroRepository;
+	private final CuentaRepository ahorroRepository;
 
 	@Autowired
-    public AhorroService(AhorroRepository ahorroRepository) {
+    public CuentaService(CuentaRepository ahorroRepository) {
         this.ahorroRepository = ahorroRepository;
     }
 
-    public List<Ahorro> getAllAhorros() {
+    public List<Cuenta> getAllAhorros() {
         return ahorroRepository.findAll();
     }
 
-    public Optional<Ahorro> getAhorroById(Long id) {
+    public Optional<Cuenta> getAhorroById(Long id) {
         return ahorroRepository.findById(id);
     }
 
-    public Ahorro createAhorro(Ahorro ahorro) {
+    public Cuenta createAhorro(Cuenta ahorro) {
         return ahorroRepository.save(ahorro);
     }
 
-    public Ahorro updateAhorro(Long id, Ahorro ahorroDetails) {
-        Optional<Ahorro> optionalAhorro = ahorroRepository.findById(id);
+    public Cuenta updateAhorro(Long id, Cuenta ahorroDetails) {
+        Optional<Cuenta> optionalAhorro = ahorroRepository.findById(id);
 
         if (optionalAhorro.isPresent()) {
-            Ahorro ahorro = optionalAhorro.get();
+            Cuenta ahorro = optionalAhorro.get();
             ahorro.setPersona(ahorroDetails.getPersona());
-            ahorro.setFecha(ahorroDetails.getFecha());
             ahorro.setMonto(ahorroDetails.getMonto());
             ahorro.setDescripcion(ahorroDetails.getDescripcion());
             return ahorroRepository.save(ahorro);
@@ -48,7 +47,7 @@ public class AhorroService {
     }
 
     public void deleteAhorro(Long id) {
-        Optional<Ahorro> optionalAhorro = ahorroRepository.findById(id);
+        Optional<Cuenta> optionalAhorro = ahorroRepository.findById(id);
 
         if (optionalAhorro.isPresent()) {
             ahorroRepository.deleteById(id);

@@ -23,7 +23,7 @@ public class PersonaController {
     private PersonaService personaService;
 
     @GetMapping("/{id}")
-    public Persona getPersona(@PathVariable Long id) {
+    public Persona getPersona(@PathVariable("id") Long id) {
         return personaService.getPersonaById(id);
     }
 
