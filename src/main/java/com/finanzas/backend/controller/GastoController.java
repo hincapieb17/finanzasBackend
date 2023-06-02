@@ -1,5 +1,6 @@
 package com.finanzas.backend.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.finanzas.backend.model.Cuenta;
+import com.finanzas.backend.model.CuentaGasto;
 import com.finanzas.backend.model.Gasto;
+import com.finanzas.backend.service.CuentaGastoService;
+import com.finanzas.backend.service.CuentaIngresoService;
+import com.finanzas.backend.service.CuentaService;
 import com.finanzas.backend.service.GastoService;
 
 @RestController
@@ -25,10 +31,15 @@ import com.finanzas.backend.service.GastoService;
 public class GastoController {
 	
 	private final GastoService gastoService;
+	private final CuentaGastoService cuentaGastoService;
+	private final CuentaService cuentaService;
+	
 
     @Autowired
-    public GastoController(GastoService gastoService) {
+    public GastoController(GastoService gastoService, CuentaGastoService cuentaGastoService, CuentaService cuentaService) {
         this.gastoService = gastoService;
+        this.cuentaGastoService  = cuentaGastoService;
+        this.cuentaService = cuentaService;
     }
 
     @GetMapping
@@ -46,8 +57,32 @@ public class GastoController {
 
     @PostMapping
     public ResponseEntity<Gasto> createGasto(@RequestBody Gasto gasto) {
-        Gasto createdGasto = gastoService.createGasto(gasto);
-        return new ResponseEntity<>(createdGasto, HttpStatus.CREATED);
+    	Gasto createdGasto = gastoService.createGasto(gasto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdGasto);
+    }
+    
+    @PostMapping("/create/{idCuenta}")
+    public ResponseEntity<Gasto> createGastosCuenta(@PathVariable("idCuenta") Long idCuenta, @RequestBody Gasto gasto){
+    	
+    	Optional<Cuenta> cuenta = cuentaService.getAhorroById(idCuenta);
+    	
+        if (cuenta != null) {
+        	Gasto createdGasto = gastoService.createGasto(gasto);
+        	
+        	
+        	CuentaGasto nuevaCuentagasto = new CuentaGasto(null, cuenta.get() ,createdGasto);
+        	CuentaGasto createdCuentaGasto = cuentaGastoService.createCuentaGasto(nuevaCuentagasto);
+        	
+        	BigDecimal montoActual = cuenta.get().getMonto();
+        	BigDecimal montoGasto = createdGasto.getMonto();
+        	cuenta.get().setMonto(montoActual.subtract(montoGasto));
+        	
+        	Cuenta updatedAhorro = cuentaService.updateAhorro(cuenta.get().getId(), cuenta.get());
+        	return ResponseEntity.status(HttpStatus.CREATED).body(createdGasto);
+        }
+    	
+    	
+    	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")

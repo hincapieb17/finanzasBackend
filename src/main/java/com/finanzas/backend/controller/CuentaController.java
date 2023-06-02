@@ -21,7 +21,7 @@ import com.finanzas.backend.service.CuentaService;
 
 
 @RestController
-@RequestMapping("/cuenta")
+@RequestMapping("/cuentas")
 @CrossOrigin(origins = "http://localhost:3000/")
 public class CuentaController {
 	
@@ -33,32 +33,32 @@ public class CuentaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Cuenta>> getAllAhorros() {
+    public ResponseEntity<List<Cuenta>> getAllCuenta() {
         List<Cuenta> ahorros = ahorroService.getAllAhorros();
         return new ResponseEntity<>(ahorros, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cuenta> getAhorroById(@PathVariable("id") Long id) {
+    public ResponseEntity<Cuenta> getCuentaById(@PathVariable("id") Long id) {
         Optional<Cuenta> ahorro = ahorroService.getAhorroById(id);
         return ahorro.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
-    public ResponseEntity<Cuenta> createAhorro(@RequestBody Cuenta ahorro) {
+    public ResponseEntity<Cuenta> createCuenta(@RequestBody Cuenta ahorro) {
         Cuenta createdAhorro = ahorroService.createAhorro(ahorro);
         return new ResponseEntity<>(createdAhorro, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cuenta> updateAhorro(@PathVariable("id") Long id, @RequestBody Cuenta ahorro) {
+    public ResponseEntity<Cuenta> updateCuenta(@PathVariable("id") Long id, @RequestBody Cuenta ahorro) {
         Cuenta updatedAhorro = ahorroService.updateAhorro(id, ahorro);
         return new ResponseEntity<>(updatedAhorro, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAhorro(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteCuenta(@PathVariable("id") Long id) {
         ahorroService.deleteAhorro(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
