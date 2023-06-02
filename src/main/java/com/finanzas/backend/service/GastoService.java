@@ -33,10 +33,10 @@ public class GastoService {
 
     
     public Gasto createGasto(Gasto gasto) {
-        
-
+    	
         return gastoRepository.save(gasto);
     }
+    
 
 
     public Gasto updateGasto(Long id, Gasto gastoDetails) {

@@ -21,7 +21,7 @@ import com.finanzas.backend.service.CuentaService;
 
 
 @RestController
-@RequestMapping("/ahorros")
+@RequestMapping("/cuenta")
 @CrossOrigin(origins = "http://localhost:3000/")
 public class CuentaController {
 	
