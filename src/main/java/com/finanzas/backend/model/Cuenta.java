@@ -18,7 +18,7 @@ public class Cuenta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     @ManyToOne
     @JoinColumn(name = "id_persona")
     private Persona persona;
@@ -50,13 +50,6 @@ public class Cuenta {
 		this.id = id;
 	}
 
-	public Persona getPersona() {
-		return persona;
-	}
-
-	public void setPersona(Persona persona) {
-		this.persona = persona;
-	}
 
 	public BigDecimal getMonto() {
 		return monto;
@@ -74,6 +67,12 @@ public class Cuenta {
 		this.descripcion = descripcion;
 	}
 
-    
-    
+	public Persona getPersona() {
+		return persona;
+	}
+
+	public void setPersona(Persona persona) {
+		this.persona = persona;
+	}
+	
 }

@@ -18,10 +18,6 @@ public class Gasto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "id_persona")
-    private Persona persona;
     
     @ManyToOne
     @JoinColumn(name = "id_categoria_ingreso")
@@ -41,10 +37,9 @@ public class Gasto {
 		super();
 	}
 
-	public Gasto(Long id, Persona persona, CategoriaGasto categoriaGasto, LocalDate fecha, BigDecimal monto, String descripcion) {
+	public Gasto(Long id, CategoriaGasto categoriaGasto, LocalDate fecha, BigDecimal monto, String descripcion) {
 		super();
 		this.id = id;
-		this.persona = persona;
 		this.categoriaGasto = categoriaGasto;
 		this.fecha = fecha;
 		this.monto = monto;
@@ -57,14 +52,6 @@ public class Gasto {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Persona getPersona() {
-		return persona;
-	}
-
-	public void setPersona(Persona persona) {
-		this.persona = persona;
 	}
 
 	public LocalDate getFecha() {

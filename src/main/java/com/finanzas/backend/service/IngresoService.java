@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.finanzas.backend.model.Cuenta;
 import com.finanzas.backend.model.Ingreso;
 import com.finanzas.backend.repository.IngresoRepository;
 
@@ -36,7 +37,6 @@ public class IngresoService {
 
         if (optionalIngreso.isPresent()) {
             Ingreso ingreso = optionalIngreso.get();
-            ingreso.setPersona(ingresoDetails.getPersona());
             ingreso.setCategoriaIngreso(ingresoDetails.getCategoriaIngreso());
             ingreso.setFecha(ingresoDetails.getFecha());
             ingreso.setMonto(ingresoDetails.getMonto());

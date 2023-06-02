@@ -37,7 +37,6 @@ public class CuentaService {
 
         if (optionalAhorro.isPresent()) {
             Cuenta ahorro = optionalAhorro.get();
-            ahorro.setPersona(ahorroDetails.getPersona());
             ahorro.setMonto(ahorroDetails.getMonto());
             ahorro.setDescripcion(ahorroDetails.getDescripcion());
             return ahorroRepository.save(ahorro);
