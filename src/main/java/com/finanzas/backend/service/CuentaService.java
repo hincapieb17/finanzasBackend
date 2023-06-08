@@ -1,5 +1,9 @@
 package com.finanzas.backend.service;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,51 +11,79 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.finanzas.backend.model.Cuenta;
+import com.finanzas.backend.model.IngresoGastoDto;
 import com.finanzas.backend.repository.CuentaRepository;
 
 @Service
 public class CuentaService {
 	
+	private final CuentaRepository cuentaRepository;
 	
-	private final CuentaRepository ahorroRepository;
+    @Autowired
+    public CuentaService(CuentaRepository cuentaRepository) {
+        this.cuentaRepository = cuentaRepository;
+    }
+    
+    
+    public List<IngresoGastoDto> obtenerMovimientos() {
+        List<Object[]> movimientos = cuentaRepository.obtenerMovimientos();
+        List<IngresoGastoDto> ingresosGastos = new ArrayList<>();
 
-	@Autowired
-    public CuentaService(CuentaRepository ahorroRepository) {
-        this.ahorroRepository = ahorroRepository;
+        for (Object[] movimiento : movimientos) {
+            LocalDate fecha = ((Date) movimiento[0]).toLocalDate();
+            BigDecimal ingresos = (BigDecimal) movimiento[1];
+            BigDecimal gastos = (BigDecimal) movimiento[2];
+
+            IngresoGastoDto ingresoGastoDto = new IngresoGastoDto(fecha, ingresos, gastos);
+            ingresosGastos.add(ingresoGastoDto);
+        }
+
+        return ingresosGastos;
     }
 
-    public List<Cuenta> getAllAhorros() {
-        return ahorroRepository.findAll();
+    public Cuenta getCuentaById(Long id) {
+        Optional<Cuenta> cuentaOptional = cuentaRepository.findById(id);
+        return cuentaOptional.orElse(null);
     }
 
-    public Optional<Cuenta> getAhorroById(Long id) {
-        return ahorroRepository.findById(id);
+    public Cuenta createCuenta(Cuenta cuenta) {
+        return cuentaRepository.save(cuenta);
     }
 
-    public Cuenta createAhorro(Cuenta ahorro) {
-        return ahorroRepository.save(ahorro);
-    }
-
-    public Cuenta updateAhorro(Long id, Cuenta ahorroDetails) {
-        Optional<Cuenta> optionalAhorro = ahorroRepository.findById(id);
-
-        if (optionalAhorro.isPresent()) {
-            Cuenta ahorro = optionalAhorro.get();
-            ahorro.setMonto(ahorroDetails.getMonto());
-            ahorro.setDescripcion(ahorroDetails.getDescripcion());
-            return ahorroRepository.save(ahorro);
+    public Cuenta updateCuentaGasto(Long id, BigDecimal monto) {
+        Optional<Cuenta> cuentaOptional = cuentaRepository.findById(id);
+        if (cuentaOptional.isPresent()) {
+            Cuenta cuenta = cuentaOptional.get();
+            BigDecimal montoActual = cuenta.getMonto();
+            BigDecimal nuevoMonto = montoActual.subtract(monto);
+            cuenta.setMonto(nuevoMonto);
+            return cuentaRepository.save(cuenta);
         } else {
-            throw new IllegalArgumentException("No se encontró el ahorro con el ID proporcionado: " + id);
+            return null;
         }
     }
-
-    public void deleteAhorro(Long id) {
-        Optional<Cuenta> optionalAhorro = ahorroRepository.findById(id);
-
-        if (optionalAhorro.isPresent()) {
-            ahorroRepository.deleteById(id);
+    
+    public Cuenta updateCuentaIngreso(Long id, BigDecimal monto) {
+        Optional<Cuenta> cuentaOptional = cuentaRepository.findById(id);
+        if (cuentaOptional.isPresent()) {
+            Cuenta cuenta = cuentaOptional.get();
+            BigDecimal montoActual = cuenta.getMonto();
+            BigDecimal nuevoMonto = montoActual.add(monto);
+            cuenta.setMonto(nuevoMonto);
+            return cuentaRepository.save(cuenta);
         } else {
-            throw new IllegalArgumentException("No se encontró el ahorro con el ID proporcionado: " + id);
+            return null;
+        }
+    }
+    
+
+    public boolean deleteCuenta(Long id) {
+        Optional<Cuenta> cuentaOptional = cuentaRepository.findById(id);
+        if (cuentaOptional.isPresent()) {
+            cuentaRepository.delete(cuentaOptional.get());
+            return true;
+        } else {
+            return false;
         }
     }
 

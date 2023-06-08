@@ -1,13 +1,13 @@
 package com.finanzas.backend.service;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.finanzas.backend.model.Cuenta;
 import com.finanzas.backend.model.Gasto;
 import com.finanzas.backend.repository.GastoRepository;
 
@@ -15,7 +15,7 @@ import com.finanzas.backend.repository.GastoRepository;
 public class GastoService {
 	
 	private final GastoRepository gastoRepository;
-    private final CuentaService cuentaService;
+	private final CuentaService cuentaService;
 
     @Autowired
     public GastoService(GastoRepository gastoRepository, CuentaService cuentaService) {
@@ -23,44 +23,37 @@ public class GastoService {
         this.cuentaService = cuentaService;
     }
 
-    public List<Gasto> getAllGastos() {
-        return gastoRepository.findAll();
-    }
-
-    public Optional<Gasto> getGastoById(Long id) {
-        return gastoRepository.findById(id);
-    }
-
-    
-    public Gasto createGasto(Gasto gasto) {
-    	
-        return gastoRepository.save(gasto);
+    public Gasto getGastoById(Long id) {
+        Optional<Gasto> gastoOptional = gastoRepository.findById(id);
+        return gastoOptional.orElse(null);
     }
     
+    @Transactional
+    public Gasto createGasto(Gasto gasto, Long idCuenta) {
+    	Gasto gastoNuevo = gastoRepository.save(gasto);
+        gastoRepository.relacionarGastoConCuenta(idCuenta);
+        cuentaService.updateCuentaGasto(idCuenta, gastoNuevo.getMonto());
+        return gastoNuevo;
+    }
 
 
-    public Gasto updateGasto(Long id, Gasto gastoDetails) {
-        Optional<Gasto> optionalGasto = gastoRepository.findById(id);
-
-        if (optionalGasto.isPresent()) {
-            Gasto gasto = optionalGasto.get();
-            gasto.setCategoriaGasto(gastoDetails.getCategoriaGasto());
-            gasto.setFecha(gastoDetails.getFecha());
-            gasto.setMonto(gastoDetails.getMonto());
-            gasto.setDescripcion(gastoDetails.getDescripcion());
+    public Gasto updateGasto(Long id, Gasto gasto) {
+        Optional<Gasto> gastoOptional = gastoRepository.findById(id);
+        if (gastoOptional.isPresent()) {
+            gasto.setId(id);
             return gastoRepository.save(gasto);
         } else {
-            throw new IllegalArgumentException("No se encontró el gasto con el ID proporcionado: " + id);
+            return null;
         }
     }
 
-    public void deleteGasto(Long id) {
-        Optional<Gasto> optionalGasto = gastoRepository.findById(id);
-
-        if (optionalGasto.isPresent()) {
-            gastoRepository.deleteById(id);
+    public boolean deleteGasto(Long id) {
+        Optional<Gasto> gastoOptional = gastoRepository.findById(id);
+        if (gastoOptional.isPresent()) {
+            gastoRepository.delete(gastoOptional.get());
+            return true;
         } else {
-            throw new IllegalArgumentException("No se encontró el gasto con el ID proporcionado: " + id);
+            return false;
         }
     }
 

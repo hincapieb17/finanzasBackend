@@ -3,6 +3,8 @@ package com.finanzas.backend.service;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,46 +16,44 @@ import com.finanzas.backend.repository.IngresoRepository;
 public class IngresoService {
 	
 	private final IngresoRepository ingresoRepository;
+	private final CuentaService cuentaService;
 
     @Autowired
-    public IngresoService(IngresoRepository ingresoRepository) {
+    public IngresoService(IngresoRepository ingresoRepository, CuentaService cuentaService) {
         this.ingresoRepository = ingresoRepository;
+        this.cuentaService = cuentaService;
     }
 
-    public List<Ingreso> getAllIngresos() {
-        return ingresoRepository.findAll();
+    public Ingreso getIngresoById(Long id) {
+        Optional<Ingreso> ingresoOptional = ingresoRepository.findById(id);
+        return ingresoOptional.orElse(null);
+    }
+    
+    @Transactional
+    public Ingreso createIngreso(Ingreso ingreso, Long idIngreso) {
+    	Ingreso ingresoNuevo = ingresoRepository.save(ingreso);
+    	ingresoRepository.relacionarIngresoConCuenta(idIngreso);
+    	cuentaService.updateCuentaIngreso(idIngreso, ingresoNuevo.getMonto());
+        return ingresoNuevo ;
     }
 
-    public Optional<Ingreso> getIngresoById(Long id) {
-        return ingresoRepository.findById(id);
-    }
-
-    public Ingreso createIngreso(Ingreso ingreso) {
-        return ingresoRepository.save(ingreso);
-    }
-
-    public Ingreso updateIngreso(Long id, Ingreso ingresoDetails) {
-        Optional<Ingreso> optionalIngreso = ingresoRepository.findById(id);
-
-        if (optionalIngreso.isPresent()) {
-            Ingreso ingreso = optionalIngreso.get();
-            ingreso.setCategoriaIngreso(ingresoDetails.getCategoriaIngreso());
-            ingreso.setFecha(ingresoDetails.getFecha());
-            ingreso.setMonto(ingresoDetails.getMonto());
-            ingreso.setDescripcion(ingresoDetails.getDescripcion());
+    public Ingreso updateIngreso(Long id, Ingreso ingreso) {
+        Optional<Ingreso> ingresoOptional = ingresoRepository.findById(id);
+        if (ingresoOptional.isPresent()) {
+            ingreso.setId(id);
             return ingresoRepository.save(ingreso);
         } else {
-            throw new IllegalArgumentException("No se encontró el ingreso con el ID proporcionado: " + id);
+            return null;
         }
     }
 
-    public void deleteIngreso(Long id) {
-        Optional<Ingreso> optionalIngreso = ingresoRepository.findById(id);
-
-        if (optionalIngreso.isPresent()) {
-            ingresoRepository.deleteById(id);
+    public boolean deleteIngreso(Long id) {
+        Optional<Ingreso> ingresoOptional = ingresoRepository.findById(id);
+        if (ingresoOptional.isPresent()) {
+            ingresoRepository.delete(ingresoOptional.get());
+            return true;
         } else {
-            throw new IllegalArgumentException("No se encontró el ingreso con el ID proporcionado: " + id);
+            return false;
         }
     }
 	

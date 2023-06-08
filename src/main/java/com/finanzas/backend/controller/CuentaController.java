@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.finanzas.backend.model.Cuenta;
+import com.finanzas.backend.model.IngresoGastoDto;
 import com.finanzas.backend.service.CuentaService;
 
 
@@ -25,42 +26,43 @@ import com.finanzas.backend.service.CuentaService;
 @CrossOrigin(origins = "http://localhost:3000/")
 public class CuentaController {
 	
-	private final CuentaService ahorroService;
+	private final CuentaService cuentaService;
 
     @Autowired
-    public CuentaController(CuentaService ahorroService) {
-        this.ahorroService = ahorroService;
+    public CuentaController(CuentaService cuentaService) {
+        this.cuentaService = cuentaService;
     }
-
-    @GetMapping
-    public ResponseEntity<List<Cuenta>> getAllCuenta() {
-        List<Cuenta> ahorros = ahorroService.getAllAhorros();
-        return new ResponseEntity<>(ahorros, HttpStatus.OK);
+    
+    @GetMapping("/movimientos")
+    public ResponseEntity<List<IngresoGastoDto>> obtenerMovimientos() {
+    	List<IngresoGastoDto> movimientosJson = cuentaService.obtenerMovimientos();
+    	return ResponseEntity.ok(movimientosJson);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cuenta> getCuentaById(@PathVariable("id") Long id) {
-        Optional<Cuenta> ahorro = ahorroService.getAhorroById(id);
-        return ahorro.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<Cuenta> getCuentaById(@PathVariable Long id) {
+        Cuenta cuenta = cuentaService.getCuentaById(id);
+        if (cuenta != null) {
+            return ResponseEntity.ok(cuenta);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public ResponseEntity<Cuenta> createCuenta(@RequestBody Cuenta ahorro) {
-        Cuenta createdAhorro = ahorroService.createAhorro(ahorro);
-        return new ResponseEntity<>(createdAhorro, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Cuenta> updateCuenta(@PathVariable("id") Long id, @RequestBody Cuenta ahorro) {
-        Cuenta updatedAhorro = ahorroService.updateAhorro(id, ahorro);
-        return new ResponseEntity<>(updatedAhorro, HttpStatus.OK);
+    public ResponseEntity<Cuenta> createCuenta(@RequestBody Cuenta cuenta) {
+        Cuenta createdCuenta = cuentaService.createCuenta(cuenta);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCuenta);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCuenta(@PathVariable("id") Long id) {
-        ahorroService.deleteAhorro(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> deleteCuenta(@PathVariable Long id) {
+        boolean deleted = cuentaService.deleteCuenta(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

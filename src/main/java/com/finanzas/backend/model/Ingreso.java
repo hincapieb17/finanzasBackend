@@ -15,23 +15,22 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "ingreso")
 public class Ingreso {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @ManyToOne
-    @JoinColumn(name = "id_categoria_ingreso")
-    private CategoriaIngreso categoriaIngreso;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = true)
-    private LocalDate fecha;
+	@ManyToOne
+	@JoinColumn(name = "id_categoria_ingreso")
+	private CategoriaIngreso categoriaIngreso;
 
-    @Column(nullable = true)
-    private BigDecimal monto;
+	@Column(nullable = true)
+	private LocalDate fecha;
 
-    @Column(length = 30, nullable = true)
-    private String descripcion;
-    
+	@Column(nullable = true)
+	private BigDecimal monto;
+
+	@Column(length = 30, nullable = true)
+	private String descripcion;
 
 	public Ingreso() {
 		super();
@@ -85,8 +84,5 @@ public class Ingreso {
 	public void setCategoriaIngreso(CategoriaIngreso categoriaIngreso) {
 		this.categoriaIngreso = categoriaIngreso;
 	}
-	
-	
-	
-}
 
+}
